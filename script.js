@@ -1,4 +1,6 @@
 const gameContainer = document.querySelector(".gameContainer");
+const player1Div = document.querySelector(".player.one");
+const player2Div = document.querySelector(".player.two");
 
 //GameBoard
 const gameBoard = () => {
@@ -22,6 +24,12 @@ const gameBoard = () => {
 const Player = (sort) => {
   const getSort = () => sort;
   let myTurn = false;
+  let points = 0;
+
+  const getPoints = () => points;
+  const addPoint = () => {
+    points += 1;
+  };
 
   const changeTurn = () => {
     if (myTurn == false) {
@@ -33,7 +41,7 @@ const Player = (sort) => {
 
   const getTurn = () => myTurn;
 
-  return { getSort, changeTurn, getTurn };
+  return { getSort, changeTurn, getTurn, addPoint, getPoints };
 };
 
 //GameFlow
@@ -47,6 +55,17 @@ const gameFlow = () => {
     let grid = board.getGrid();
     renderGen.renderGame(grid);
     player1.changeTurn();
+  };
+
+  const resetBoard = () => {
+    for (i = 0; i < 3; i++) {
+      for (j = 0; j < 3; j++) {
+        board.changeTile(i, j, "");
+        let tile = gameContainer.querySelectorAll(`[data-coor="${i}${j}"]`);
+        tile = tile[0];
+        renderGen.changeTile(tile, "");
+      }
+    }
   };
 
   const placeTile = (coor) => {
@@ -63,6 +82,9 @@ const gameFlow = () => {
 
       player1.changeTurn();
       player2.changeTurn();
+
+      player2Div.classList.add("active");
+      player1Div.classList.remove("active");
     } else if (player2.getTurn() == true) {
       board.changeTile(cord1, cord2, "O");
       renderGen.changeTile(tile, "O");
@@ -70,6 +92,9 @@ const gameFlow = () => {
 
       player1.changeTurn();
       player2.changeTurn();
+
+      player1Div.classList.add("active");
+      player2Div.classList.remove("active");
     }
   };
 
@@ -142,9 +167,19 @@ const gameFlow = () => {
 
   const winnerEvent = () => {
     if (player1.getTurn()) {
+      player1.addPoint();
+      document.querySelector(
+        ".player1Points"
+      ).textContent = `Points: ${player1.getPoints()}`;
       alert("Player1 won the game!");
+      resetBoard();
     } else if (player2.getTurn()) {
+      player2.addPoint();
+      document.querySelector(
+        ".player2Points"
+      ).textContent = `Points: ${player2.getPoints()}`;
       alert("Player2 won the game!");
+      resetBoard();
     }
   };
 
